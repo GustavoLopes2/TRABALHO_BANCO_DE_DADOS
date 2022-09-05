@@ -1,0 +1,78 @@
+#05/09/2022
+DROP DATABASE IF EXISTS projeto;
+CREATE DATABASE projeto;
+USE projeto;
+
+CREATE TABLE produto (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(255) NOT NULL, 
+preço_venda DECIMAL(8, 2) NOT NULL,
+preço_custo DECIMAL(8, 2) NOT NULL,
+ativo CHAR(1) NOT NULL DEFAULT 'S' 
+);
+
+INSERT INTO produto(nome,preço_custo,preço_venda) VALUES ('1 KG DE ARROZ', 2.99, 3.99);
+INSERT INTO produto(nome,preço_custo,preço_venda) VALUES ('1 KG DE AÇUCAR', 1.09, 1.99);
+INSERT INTO produto(nome,preço_custo,preço_venda) VALUES ('LATA DE MILHO', 5.35, 6.70);
+
+CREATE TABLE estado(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(255) NOT NULL UNIQUE,
+sigla CHAR(2) NOT NULL UNIQUE,
+ativo CHAR(1) NOT NULL DEFAULT 'S'
+);
+
+INSERT INTO estado(nome,sigla) VALUES ('PARANÁ','PR');
+INSERT INTO estado(nome,sigla) VALUES ('SÃO PAULO','SP');
+INSERT INTO estado(nome,sigla) VALUES ('MATO GROSSO','MT');
+
+CREATE TABLE cidade(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(255) NOT NULL,
+estado_id INT NOT NULL,
+ativo CHAR(1) NOT NULL DEFAULT 'S',
+FOREIGN KEY (estado_id) REFERENCES estado (ID)
+);
+
+INSERT INTO cidade(nome,estado_id) VALUES ('PARANAVAÍ',1);
+INSERT INTO cidade(nome,estado_id) VALUES ('MARINGÁ',2);
+INSERT INTO cidade(nome,estado_id) VALUES ('LONDRINA',3);
+
+CREATE TABLE cliente (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(255) NOT NULL,
+cpf CHAR(16)
+);
+
+INSERT INTO cliente(nome,cpf) VALUES ('ROGERIO','521.267.674.42');
+INSERT INTO cliente (nome,cpf) VALUES ('GUSTAVO','471.328.528.50');
+INSERT INTO cliente(nome,cpf) VALUES ('ROBERTO','414.683.821.32');
+
+CREATE TABLE categoria(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(45),
+descricao VARCHAR(255),
+FOREIGN KEY (categoria_produto_id) REFERENCES categoria_produto (ID) -- A TABELA "categoria_produto" AINDA SERÁ CRIADA.
+);
+
+INSERT INTO categoria (nome,descricao) VALUES ('BISCOITO', 'BISCOITO COMESTÍVEL.');
+INSERT INTO categoria (nome,descricao) VALUES ('COSMETICO', 'CATEGORIAS DE MAQUIAGEM');
+INSERT INTO categoria (nome,descricao) VALUES ('CARNE', 'CARNES DERIVADAS');
+
+CREATE TABLE tipo (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(45),
+descricao VARCHAR (255),
+FOREIGN KEY (tipo_produto_id) REFERENCES tipo_produto (ID) -- A TABELA "tipo_produto" AINDA SERÁ CRIADA.
+);
+
+INSERT INTO tipo (nome, descricao) VALUES ('SALGADA', 'BOLACHAS SALGADAS');
+INSERT INTO tipo (nome, descricao) VALUES ('MAQUIAGEM DE ROSTO', 'PRODUTOS DE MAGUIAGEM PARA ROSTO');
+INSERT INTO tipo (nome, descricao) VALUES ('CARNE BRANCA', 'CARNES DE PEIXES, FRANGOS');
+
+SELECT * FROM produto;
+SELECT * FROM cliente;
+SELECT * FROM tipo;
+SELECT * FROM categoria;
+SELECT * FROM cidade;
+SELECT * FROM estado;
