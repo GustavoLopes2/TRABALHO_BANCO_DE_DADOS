@@ -51,8 +51,8 @@ INSERT INTO cliente(nome,cpf) VALUES ('ROBERTO','414.683.821.32');
 CREATE TABLE categoria(
 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 nome VARCHAR(45),
-descricao VARCHAR(255),
-FOREIGN KEY (categoria_produto_id) REFERENCES categoria_produto (ID) -- A TABELA "categoria_produto" AINDA SERÁ CRIADA.
+descricao VARCHAR(255)
+-- FOREIGN KEY (categoria_produto_id) REFERENCES categoria_produto (ID) -- A TABELA "categoria_produto" AINDA SERÁ CRIADA.
 );
 
 INSERT INTO categoria (nome,descricao) VALUES ('BISCOITO', 'BISCOITO COMESTÍVEL.');
@@ -62,8 +62,8 @@ INSERT INTO categoria (nome,descricao) VALUES ('CARNE', 'CARNES DERIVADAS');
 CREATE TABLE tipo (
 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 nome VARCHAR(45),
-descricao VARCHAR (255),
-FOREIGN KEY (tipo_produto_id) REFERENCES tipo_produto (ID) -- A TABELA "tipo_produto" AINDA SERÁ CRIADA.
+descricao VARCHAR (255)
+-- FOREIGN KEY (tipo_produto_id) REFERENCES tipo_produto (ID) -- A TABELA "tipo_produto" AINDA SERÁ CRIADA.
 );
 
 INSERT INTO tipo (nome, descricao) VALUES ('SALGADA', 'BOLACHAS SALGADAS');
@@ -76,3 +76,4 @@ SELECT * FROM tipo;
 SELECT * FROM categoria;
 SELECT * FROM cidade;
 SELECT * FROM estado;
+
