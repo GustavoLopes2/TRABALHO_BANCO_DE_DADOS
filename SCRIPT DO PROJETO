@@ -1,0 +1,223 @@
+DROP DATABASE IF EXISTS projeto;
+CREATE DATABASE projeto;
+USE projeto;
+
+CREATE TABLE cliente (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(255) NOT NULL,
+cpf CHAR(11) NOT NULL -- Apenas números
+);
+
+INSERT INTO cliente(nome,cpf) VALUES ('ROGERIO','52126767442');
+INSERT INTO cliente (nome,cpf) VALUES ('GUSTAVO','47132852850');
+INSERT INTO cliente(nome,cpf) VALUES ('ROBERTO','41468382132');
+
+CREATE TABLE venda (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+forma_de_pagamento VARCHAR(45) NOT NULL, -- Aqui seria cartão ou dinheiro
+nota_fiscal VARCHAR(255),
+total_com_desconto DECIMAL(8,2),
+valor_pagamento DECIMAL(8,2)
+);
+
+INSERT INTO venda(forma_de_pagamento, nota_fiscal, total_com_desconto, valor_pagamento) VALUES ('CARTÃO','PRODUTOS... TOTAL...','242.87','242.87');
+INSERT INTO venda(forma_de_pagamento, nota_fiscal, total_com_desconto, valor_pagamento) VALUES ('DINHEIRO','PRODUTOS... TOTAL...','154.78','160.');
+INSERT INTO venda(forma_de_pagamento, nota_fiscal, total_com_desconto, valor_pagamento) VALUES ('CARTÃO','PRODUTOS... TOTAL...','546.90','546.90');
+
+CREATE TABLE produto (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(255) NOT NULL, 
+preço_venda DECIMAL(8, 2) NOT NULL,
+preço_custo DECIMAL(8, 2) NOT NULL,
+ativo CHAR(1) NOT NULL DEFAULT 'S' 
+);
+
+INSERT INTO produto(nome,preço_custo,preço_venda) VALUES ('1 KG DE ARROZ', 2.99, 3.99);
+INSERT INTO produto(nome,preço_custo,preço_venda) VALUES ('1 KG DE AÇUCAR', 1.09, 1.99);
+INSERT INTO produto(nome,preço_custo,preço_venda) VALUES ('LATA DE MILHO', 5.35, 6.70);
+
+CREATE TABLE produto_venda (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+quantidade INT NOT NULL,
+preço DECIMAL(8,2) NOT NULL,
+produto_id INT NOT NULL,
+venda_id INT NOT NULL,
+CONSTRAINT produto_venda_produto FOREIGN KEY (produto_id) REFERENCES produto (id),
+CONSTRAINT produto_venda_venda FOREIGN KEY (venda_id) REFERENCES venda(id)
+);
+
+INSERT INTO produto_venda (quantidade, preço, produto_id, venda_id) VALUES ('32','242.89',1,1);
+INSERT INTO produto_venda (quantidade, preço, produto_id, venda_id) VALUES ('21','167.98',2,2);
+INSERT INTO produto_venda (quantidade, preço, produto_id, venda_id) VALUES ('56','342.23',3,3);
+
+
+CREATE TABLE tipo (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(45) NOT NULL,
+descricao VARCHAR (255) NOT NULL
+);
+
+INSERT INTO tipo (nome, descricao) VALUES ('SALGADA', 'BOLACHAS SALGADAS');
+INSERT INTO tipo (nome, descricao) VALUES ('MAQUIAGEM DE ROSTO', 'PRODUTOS DE MAGUIAGEM PARA ROSTO');
+INSERT INTO tipo (nome, descricao) VALUES ('CARNE BRANCA', 'CARNES DE PEIXES, FRANGOS');
+
+CREATE TABLE tipo_produto (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+produto_id INT NOT NULL,
+tipo_id INT NOT NULL,
+CONSTRAINT fk_tipo_produto_produto FOREIGN KEY(produto_id) REFERENCES produto (id),
+CONSTRAINT fk_tipo_produto_tipo FOREIGN KEY(tipo_id) REFERENCES tipo (id)
+);
+
+INSERT INTO tipo_produto (produto_id, tipo_id) VALUES (1,1);
+INSERT INTO tipo_produto (produto_id, tipo_id) VALUES (2,2);
+INSERT INTO tipo_produto (produto_id, tipo_id) VALUES (3,3);
+
+CREATE TABLE categoria(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(45) NOT NULL,
+descricao VARCHAR(255) NOT NULL
+);
+
+INSERT INTO categoria (nome,descricao) VALUES ('BISCOITO', 'BISCOITO COMESTÍVEL.');
+INSERT INTO categoria (nome,descricao) VALUES ('COSMETICO', 'CATEGORIAS DE MAQUIAGEM');
+INSERT INTO categoria (nome,descricao) VALUES ('CARNE', 'CARNES DERIVADAS');
+
+CREATE TABLE categoria_produto(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+categoria_id INT NOT NULL,
+produto_id INT NOT NULL,
+CONSTRAINT fk_categoria_produto_categoria FOREIGN KEY (categoria_id) REFERENCES categoria (id),
+CONSTRAINT fk_tipo_produto_produt FOREIGN KEY(produto_id) REFERENCES produto (id)
+);
+
+INSERT INTO categoria_produto (categoria_id, produto_id) VALUES (1,1);
+INSERT INTO categoria_produto (categoria_id, produto_id) VALUES (2,2);
+INSERT INTO categoria_produto (categoria_id, produto_id) VALUES (3,3);
+
+
+CREATE TABLE recebimento (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+ativo CHAR(1) NOT NULL DEFAULT 'S',
+numero_de_parcelas INT NOT NULL,
+preço_final DECIMAL(8,2),
+juros DECIMAL,
+venda_id INT NOT NULL,
+CONSTRAINT fk_recebimento_venda FOREIGN KEY (venda_id) REFERENCES venda(id)
+);
+
+INSERT INTO recebimento (numero_de_parcelas, preço_final, juros, venda_id) VALUES ('2','350.00','12.87',1);
+INSERT INTO recebimento (numero_de_parcelas, preço_final, juros, venda_id) VALUES ('0','120.50','24.00',2);
+INSERT INTO recebimento (numero_de_parcelas, preço_final, juros, venda_id) VALUES ('8','1250.99','112.32',3);
+
+CREATE TABLE caixa(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+saldo DECIMAL(8,2) NOT NULL,
+ativo CHAR(1) NOT NULL DEFAULT 'S',
+CONSTRAINT estado_ativo_deve_ser_S_ou_N CHECK (ativo IN('S','N'))
+);
+
+INSERT INTO caixa (saldo) VALUES ('768.89');
+INSERT INTO caixa (saldo) VALUES ('863.00');
+INSERT INTO caixa (saldo) VALUES ('1262.64');
+
+
+CREATE TABLE item_de_caixa(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+descriçao VARCHAR(255) NOT NULL,
+valor DECIMAL(8,2) NOT NULL,
+hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+recebimento_id INT NOT NULL,
+caixa_id INT NOT NULL,
+CONSTRAINT fk_item_de_caixa_recebimento FOREIGN KEY (recebimento_id) REFERENCES recebimento(id),
+CONSTRAINT fk_item_de_caixa_caixa FOREIGN KEY (caixa_id) REFERENCES caixa(id)
+);
+
+INSERT INTO item_de_caixa (descriçao, valor, recebimento_id, caixa_id) VALUES ('ESTE PRODUTO...','12.40', 1, 1);
+INSERT INTO item_de_caixa (descriçao, valor, recebimento_id, caixa_id) VALUES ('A BARRA DE CHOCOLATE GAROTO...','5.99', 2, 2);
+INSERT INTO item_de_caixa (descriçao, valor, recebimento_id, caixa_id) VALUES ('ESTA BOLACHA É FEITA DE...','8.50', 3, 3);
+
+CREATE TABLE estado(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(255) NOT NULL UNIQUE,
+sigla CHAR(2) NOT NULL UNIQUE,
+ativo CHAR(1) NOT NULL DEFAULT 'S',
+CONSTRAINT estado_ativo_deve_ser_S_ou_N CHECK (ativo IN('S','N'))
+);
+
+INSERT INTO estado(nome,sigla) VALUES ('PARANÁ','PR');
+INSERT INTO estado(nome,sigla) VALUES ('SÃO PAULO','SP');
+INSERT INTO estado(nome,sigla) VALUES ('MATO GROSSO','MT');
+
+CREATE TABLE cidade(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(255) NOT NULL,
+ativo CHAR(1) NOT NULL DEFAULT 'S',
+estado_id INT NOT NULL,
+CONSTRAINT fk_cidade_estado FOREIGN KEY (estado_id) REFERENCES estado(id),
+CONSTRAINT cidade_ativo_deve_ser_S_ou_N CHECK (ativo IN('S','N')),
+CONSTRAINT cidade_unica UNIQUE(nome, estado_id)
+);
+
+INSERT INTO cidade(nome,estado_id) VALUES ('PARANAVAÍ',1);
+INSERT INTO cidade(nome,estado_id) VALUES ('CAMPINAS',2);
+INSERT INTO cidade(nome,estado_id) VALUES ('MUNDO NOVO',3);
+
+CREATE TABLE endereço (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome_rua VARCHAR(100) NOT NULL,
+numero_local INT NOT NULL,
+cidade_id INT NOT NULL,
+CONSTRAINT fk_endereço_cidade FOREIGN KEY (cidade_id) REFERENCES cidade(id)
+);
+
+INSERT INTO endereço (nome_rua, numero_local, cidade_id) VALUES ('RUA 21 DE ABRIL','120',1);
+INSERT INTO endereço (nome_rua, numero_local, cidade_id) VALUES ('RUA 3 DE MARÇO','95',2);
+INSERT INTO endereço (nome_rua, numero_local, cidade_id) VALUES ('RUA 5 DE DEZEMBRO','86',3);
+
+CREATE TABLE fornecedor (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(100) NOT NULL,
+telefone VARCHAR(35) NOT NULL,
+endereço_id INT NOT NULL,
+CONSTRAINT fk_fornecedor_endereço FOREIGN KEY (endereço_id) REFERENCES endereço (id)
+);
+
+INSERT INTO fornecedor (nome, telefone, endereço_id) VALUES ('BAUDUCO','(11) 99532-4123',1);
+INSERT INTO fornecedor (nome, telefone, endereço_id) VALUES ('GAROTO','(44) 99312-3412',2);
+INSERT INTO fornecedor (nome, telefone, endereço_id) VALUES ('OMO','(13) 99323-5123',3);
+
+CREATE TABLE demandas (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+quantidade_de_produto INT NOT NULL,
+tipo_do_produto VARCHAR(100) NOT NULL,
+caixa_id INT NOT NULL,
+fornecedor_id INT NOT NULL,
+CONSTRAINT fk_demandas_caixa FOREIGN KEY (caixa_id) REFERENCES caixa(id),
+CONSTRAINT fk_demandas_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor(id)
+);
+
+INSERT INTO demandas (quantidade_de_produto, tipo_do_produto, caixa_id, fornecedor_id) VALUES ('120', 'CHOCOLATE SNICKERS', 1, 1);
+INSERT INTO demandas (quantidade_de_produto, tipo_do_produto, caixa_id, fornecedor_id) VALUES ('50', 'PACOTE DE ARROZ 5KG', 2, 2);
+INSERT INTO demandas (quantidade_de_produto, tipo_do_produto, caixa_id, fornecedor_id) VALUES ('20', 'VASSOURAS', 3, 3);
+
+SELECT * FROM cliente;
+SELECT * FROM venda;
+SELECT * FROM produto;
+SELECT * FROM produto_venda;
+SELECT * FROM tipo_produto;
+SELECT * FROM categoria_produto;
+SELECT * FROM categoria;
+SELECT * FROM tipo;
+SELECT * FROM recebimento;
+SELECT * FROM item_de_caixa;
+SELECT * FROM caixa;
+SELECT * FROM demandas;
+SELECT * FROM fornecedor;
+SELECT * FROM endereço;
+SELECT * FROM cidade;
+SELECT * FROM estado;
+
+
+
